@@ -33,7 +33,7 @@ typedef struct object {
   name_t name;
 } object;
 
-static object objects[] = { { "" }, { "notebook" }, { "mirror" }, { "lighter" } };
+static object objects[] = {{""}, {"notebook"}, {"mirror"}, {"lighter"}};
 
 typedef struct entity {
   name_t name;
@@ -41,7 +41,7 @@ typedef struct entity {
   object_id_t objects[ENTITY_MAX_OBJECTS];
 } entity;
 
-static entity entities[] = { { "", 0, { 0 } }, { "me", 1, { 2 } }, { "u", 2, { 0 } } };
+static entity entities[] = {{"", 0, {0}}, {"me", 1, {2}}, {"u", 2, {0}}};
 
 typedef struct location {
   name_t name;
@@ -50,20 +50,22 @@ typedef struct location {
   location_id_t exits[LOCATION_MAX_EXITS];
 } location;
 
-static location locations[] = { { "", { 0 }, { 0 }, { 0 } },
-                                { "roome", { 0 }, { 1 }, { 2, 3, 0, 4 } },
-                                { "office", { 1, 3 }, { 2 }, { 0, 0, 1 } },
-                                { "bathroom", { 0 }, { 0 }, { 0 } },
-                                { "kitchen", { 0 }, { 0 }, { 0, 1 } } };
+static location locations[] = {{"", {0}, {0}, {0}},
+                               {"roome", {0}, {1}, {2, 3, 0, 4}},
+                               {"office", {1, 3}, {2}, {0, 0, 1}},
+                               {"bathroom", {0}, {0}, {0}},
+                               {"kitchen", {0}, {0}, {0, 1}}};
 
-static const char *exit_names[] = { "north", "east", "south",
-                                    "west", "up", "down" };
+static const char *exit_names[] = {"north", "east", "south",
+                                   "west",  "up",   "down"};
 
 void print_help();
 void print_location(location_id_t lid, entity_id_t eid_exclude_from_output);
-bool_t add_object_to_list(object_id_t list[], unsigned list_len, object_id_t oid);
+bool_t add_object_to_list(object_id_t list[], unsigned list_len,
+                          object_id_t oid);
 void remove_object_from_list_by_index(object_id_t list[], unsigned ix);
-bool_t add_entity_to_list(entity_id_t list[], unsigned list_len, entity_id_t eid);
+bool_t add_entity_to_list(entity_id_t list[], unsigned list_len,
+                          entity_id_t eid);
 void remove_entity_from_list_by_index(entity_id_t list[], unsigned ix);
 void remove_entity_from_list(entity_id_t list[], unsigned list_len,
                              entity_id_t eid);
@@ -91,10 +93,11 @@ void run() {
     input(&inbuf);
     uart_send_str("\r\n");
     handle_input(active_entity, &inbuf);
-    if (active_entity == 1)
+    if (active_entity == 1) {
       active_entity = 2;
-    else
+    } else {
       active_entity = 1;
+    }
   }
 }
 
@@ -107,8 +110,9 @@ void handle_input(entity_id_t eid, input_buffer *buf) {
     while (*ptr && *ptr != ' ') {
       ptr++;
     }
-    if (!*ptr)
+    if (!*ptr) {
       break;
+    }
     *ptr = 0;
     ptr++;
     if (nwords == sizeof(words) / sizeof(const char *)) {
@@ -167,8 +171,9 @@ void print_location(location_id_t lid, entity_id_t eid_exclude_from_output) {
   const object_id_t *lso = loc->objects;
   for (unsigned i = 0; i < LOCATION_MAX_OBJECTS; i++) {
     const object_id_t oid = lso[i];
-    if (!oid)
+    if (!oid) {
       break;
+    }
     if (counter++) {
       uart_send_str(", ");
     }
@@ -184,10 +189,12 @@ void print_location(location_id_t lid, entity_id_t eid_exclude_from_output) {
   const entity_id_t *lse = loc->entities;
   for (unsigned i = 0; i < LOCATION_MAX_ENTITIES; i++) {
     const entity_id_t eid = lse[i];
-    if (!eid)
+    if (!eid) {
       break;
-    if (eid == eid_exclude_from_output)
+    }
+    if (eid == eid_exclude_from_output) {
       continue;
+    }
     if (counter++) {
       uart_send_str(", ");
     }
@@ -201,8 +208,9 @@ void print_location(location_id_t lid, entity_id_t eid_exclude_from_output) {
   counter = 0;
   uart_send_str("exits: ");
   for (unsigned i = 0; i < LOCATION_MAX_EXITS; i++) {
-    if (!loc->exits[i])
+    if (!loc->exits[i]) {
       continue;
+    }
     if (counter++) {
       uart_send_str(", ");
     }
@@ -220,8 +228,9 @@ void action_inventory(entity_id_t eid) {
   const object_id_t *lso = entities[eid].objects;
   for (unsigned i = 0; i < ENTITY_MAX_OBJECTS; i++) {
     const object_id_t oid = lso[i];
-    if (!oid)
+    if (!oid) {
       break;
+    }
     if (counter++) {
       uart_send_str(", ");
     }
@@ -238,18 +247,21 @@ void remove_object_from_list_by_index(object_id_t list[], unsigned ix) {
   object_id_t *ptr = &list[ix];
   while (1) {
     *ptr = *(ptr + 1);
-    if (!*ptr)
+    if (!*ptr) {
       return;
+    }
     ptr++;
   }
 }
 
 // todo: make to O(1) instead of O(n)
-bool_t add_object_to_list(object_id_t list[], unsigned list_len, object_id_t oid) {
+bool_t add_object_to_list(object_id_t list[], unsigned list_len,
+                          object_id_t oid) {
   // list_len - 1 since last element has to be 0
   for (unsigned i = 0; i < list_len - 1; i++) {
-    if (list[i])
+    if (list[i]) {
       continue;
+    }
     list[i] = oid;
     list[i + 1] = 0;
     return TRUE;
@@ -259,11 +271,13 @@ bool_t add_object_to_list(object_id_t list[], unsigned list_len, object_id_t oid
 }
 
 // todo: make to O(1) instead of O(n)
-bool_t add_entity_to_list(entity_id_t list[], unsigned list_len, entity_id_t eid) {
+bool_t add_entity_to_list(entity_id_t list[], unsigned list_len,
+                          entity_id_t eid) {
   // list_len - 1 since last element has to be 0
   for (unsigned i = 0; i < list_len - 1; i++) {
-    if (list[i])
+    if (list[i]) {
       continue;
+    }
     list[i] = eid;
     list[i + 1] = 0;
     return TRUE;
@@ -277,13 +291,15 @@ void remove_entity_from_list(entity_id_t list[], unsigned list_len,
                              entity_id_t eid) {
   // list_len - 1 since last element has to be 0
   for (unsigned i = 0; i < list_len - 1; i++) {
-    if (list[i] != eid)
+    if (list[i] != eid) {
       continue;
+    }
     // list_len - 1 since last element has to be 0
     for (unsigned j = i; j < list_len - 1; j++) {
       list[j] = list[j + 1];
-      if (!list[j])
+      if (!list[j]) {
         return;
+      }
     }
   }
   uart_send_str("entity not here\r\n");
@@ -294,8 +310,9 @@ void remove_entity_from_list_by_index(entity_id_t list[], unsigned ix) {
   entity_id_t *ptr = &list[ix];
   while (1) {
     *ptr = *(ptr + 1);
-    if (!*ptr)
+    if (!*ptr) {
       return;
+    }
     ptr++;
   }
 }
@@ -305,10 +322,12 @@ void action_take(entity_id_t eid, name_t obj) {
   object_id_t *lso = locations[ent->location].objects;
   for (unsigned i = 0; i < LOCATION_MAX_OBJECTS; i++) {
     const object_id_t oid = lso[i];
-    if (!oid)
+    if (!oid) {
       break;
-    if (!strings_equal(objects[oid].name, obj))
+    }
+    if (!strings_equal(objects[oid].name, obj)) {
       continue;
+    }
     if (add_object_to_list(ent->objects, ENTITY_MAX_OBJECTS, oid)) {
       remove_object_from_list_by_index(lso, i);
     }
@@ -323,10 +342,12 @@ void action_drop(entity_id_t eid, name_t obj) {
   object_id_t *lso = ent->objects;
   for (unsigned i = 0; i < ENTITY_MAX_OBJECTS; i++) {
     const object_id_t oid = lso[i];
-    if (!oid)
+    if (!oid) {
       break;
-    if (!strings_equal(objects[oid].name, obj))
+    }
+    if (!strings_equal(objects[oid].name, obj)) {
       continue;
+    }
     if (add_object_to_list(locations[ent->location].objects,
                            LOCATION_MAX_OBJECTS, oid)) {
       remove_object_from_list_by_index(lso, i);
@@ -357,18 +378,22 @@ void action_give(entity_id_t eid, name_t obj, name_t to_ent) {
   const location *loc = &locations[ent->location];
   const entity_id_t *lse = loc->entities;
   for (unsigned i = 0; i < LOCATION_MAX_ENTITIES; i++) {
-    if (!lse[i])
+    if (!lse[i]) {
       break;
+    }
     entity *to = &entities[lse[i]];
-    if (!strings_equal(to->name, to_ent))
+    if (!strings_equal(to->name, to_ent)) {
       continue;
+    }
     object_id_t *lso = ent->objects;
     for (unsigned j = 0; j < ENTITY_MAX_OBJECTS; j++) {
       const object_id_t oid = lso[j];
-      if (!oid)
+      if (!oid) {
         break;
-      if (!strings_equal(objects[oid].name, obj))
+      }
+      if (!strings_equal(objects[oid].name, obj)) {
         continue;
+      }
       if (add_object_to_list(to->objects, ENTITY_MAX_OBJECTS, oid)) {
         remove_object_from_list_by_index(lso, j);
       }
@@ -385,20 +410,21 @@ void action_give(entity_id_t eid, name_t obj, name_t to_ent) {
 void print_help() {
   uart_send_str(hello);
   uart_send_str(
-    "\r\ncommand:\r\n  n: go north\r\n  e: go east\r\n  s: go south\r\n  w: "
-    "go west\r\n  i: "
-    "display inventory\r\n  t <object>: take object\r\n  d <object>: drop "
-    "object\r\n  g <object> <entity>: give object to entity\r\n  help: this "
-    "message\r\n\r\n");
+      "\r\ncommand:\r\n  n: go north\r\n  e: go east\r\n  s: go south\r\n  w: "
+      "go west\r\n  i: "
+      "display inventory\r\n  t <object>: take object\r\n  d <object>: drop "
+      "object\r\n  g <object> <entity>: give object to entity\r\n  help: this "
+      "message\r\n\r\n");
 }
-
 
 bool_t strings_equal(const char *s1, const char *s2) {
   while (1) {
-    if (*s1 - *s2)
+    if (*s1 - *s2) {
       return FALSE;
-    if (!*s1 && !*s2)
+    }
+    if (!*s1 && !*s2) {
       return TRUE;
+    }
     s1++;
     s2++;
   }
@@ -430,7 +456,8 @@ void input(input_buffer *buf) {
         buf->ix--;
         uart_send_char(ch);
       }
-    } else if (ch == CHAR_CARRIAGE_RETURN || buf->ix == sizeof(buf->line) - 1) {  // -1 since last char must be 0
+    } else if (ch == CHAR_CARRIAGE_RETURN || buf->ix == sizeof(buf->line) - 1) {
+      // -1 since last char must be 0
       buf->line[buf->ix] = 0;
       buf->ix = 0;
       return;
@@ -442,13 +469,9 @@ void input(input_buffer *buf) {
   }
 }
 
-void uart_send_char(char ch) {
-  Serial.print(ch);
-}
+void uart_send_char(char ch) { Serial.print(ch); }
 
-void uart_send_str(const char *str) {
-  Serial.print(str);
-}
+void uart_send_str(const char *str) { Serial.print(str); }
 
 char uart_read_char() {
   while (!Serial.available())
@@ -459,7 +482,7 @@ char uart_read_char() {
 void setup() {
   Serial.begin(115200);
   while (!Serial)
-    ;  // wait for serial port to connect. Needed for native USB port only
+    ; // wait for serial port to connect. Needed for native USB port only
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   run();
