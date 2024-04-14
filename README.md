@@ -5,6 +5,11 @@ exploration code
 note:
 in serial monitor enable line ending CR
 
+note:
+https://arduino-pico.readthedocs.io/en/latest/wifi.html
+Multicore is supported, but only core 0 may run WiFi related code.
+
+
 ### Visual Code
 Version: 1.88.1
 Commit: e170252f762678dec6ca2cc69aba1570769a5d39
