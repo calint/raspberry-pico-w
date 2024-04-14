@@ -2,6 +2,9 @@
 
 exploration code
 
+note:
+in serial monitor enable line ending CR
+
 ### Visual Code
 Version: 1.88.1
 Commit: e170252f762678dec6ca2cc69aba1570769a5d39
