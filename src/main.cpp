@@ -479,13 +479,26 @@ char uart_read_char() {
   return Serial.read();
 }
 
+//
+// core 0
+//
 void setup() {
   Serial.begin(115200);
   while (!Serial)
-    ; // wait for serial port to connect. Needed for native USB port only
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, HIGH);
+    ; // wait for serial port to connect. needed for native usb port only
   run();
 }
 
 void loop() {}
+
+//
+// core 1
+//
+void setup1() { pinMode(LED_BUILTIN, OUTPUT); }
+
+void loop1() {
+  digitalWrite(LED_BUILTIN, HIGH);
+  sleep_ms(1000);
+  digitalWrite(LED_BUILTIN, LOW);
+  sleep_ms(1000);
+}
